@@ -10,17 +10,16 @@
     </div>
 
     <div class="Container">
-      
+      <form method="post">
         <label for="vorname" class="kontaktformular">Vorname:</label>
         <input type="text" name="vorname" required><br>
         <label for="nachname" class="kontaktformular">Nachname:</label>
         <input type="text" name="nachname" required><br>
-
+        
         <input type="submit" name="register" value="Registrieren" class="Button">
-       
       </form>
     </div>
-    <button onclick= 
+    
     <style>
       body{
         background-color: lightblue;
@@ -52,22 +51,36 @@
     </style>
     
     <?php 
-session_start();
-$pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '');
+    session_start();
+    $pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '');
+    
+    if(isset($_POST['register'])) {
+      $error = false;
+      $vorname = $_POST['vorname'];
+      $nachname = $_POST['nachname'];
 
-if(isset($_POST['vorname']) && isset($_POST['nachname'])) {
-  $error = false;
-  $vorname = $_POST['vorname'];
-  $nachname = $_POST['nachname'];
-echo('test');
-  //Keine Fehler, wir können den Nutzer registrieren
-  if(!$error) {   
-    $statement = $pdo->prepare("INSERT INTO Kunden_ID (vorname,nachname) VALUES (:nachname,:vorname)");
-    $result = $statement->execute(array('vorname' => $vorname, 'nachname' => $nachname));
-    var_dump($pdo->errorInfo());
-  } 
-}
-?>
+        // Check if the values already exist in the database
+  $statement = $pdo->prepare("SELECT COUNT(*) FROM Kunden_ID WHERE vorname=:vorname AND nachname=:nachname");
+  $statement->execute(array('vorname' => $vorname, 'nachname' => $nachname));
+  $result = $statement->fetchColumn();
+  if($result > 0) {
+    // Display an error message to the user
+    echo "Die Kombination aus Vorname und Nachname ist bereits registriert.";
+    $error = true;
+  }
+
+      
+      
+      //Keine Fehler, wir können den Nutzer registrieren
+      if(!$error) {   
+        $statement = $pdo->prepare("INSERT INTO Kunden_ID (vorname,nachname) VALUES (:vorname,:nachname)");
+        $result = $statement->execute(array('nachname' => $nachname, 'vorname' => $vorname));
+        var_dump($pdo->errorInfo());
+        header('Location: ' . $_SERVER['PHP_SELF']); // reload the page
+        exit(); // terminate script execution
+      } 
+    }
+    ?>
 
   </body>
 </html>
