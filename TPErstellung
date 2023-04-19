@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Trainingsplan erstellen</title>
+</head>
+<body>
+	<h2>Trainingsplan</h2>
+	<form method="post" action="save.php">
+		<label for="datum">Datum:</label>
+		<input type="date" name="datum" id="datum"><br><br>
+
+		<label for="planNr">Trainingsplan Nr:</label>
+		<input type="text" name="planNr" id="planNr"><br><br>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Übung</th>
+					<th>Einheit</th>
+					<th>Sätze</th>
+					<th>Wiederholung</th>
+					<th>Tempo</th>
+					<th>Pause</th>
+					<th>Beschreibung</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php for ($i=1; $i<=11; $i++) { ?>
+					<tr>
+						<td><input type="text" name="uebung<?php echo $i ?>" id="uebung<?php echo $i ?>"></td>
+						<td><input type="text" name="einheit<?php echo $i ?>" id="einheit<?php echo $i ?>"></td>
+						<td><input type="text" name="saetze<?php echo $i ?>" id="saetze<?php echo $i ?>"></td>
+						<td><input type="text" name="wiederholung<?php echo $i ?>" id="wiederholung<?php echo $i ?>"></td>
+						<td><input type="text" name="tempo<?php echo $i ?>" id="tempo<?php echo $i ?>"></td>
+						<td><input type="text" name="pause<?php echo $i ?>" id="pause<?php echo $i ?>"></td>
+						<td><input type="text" name="beschreibung<?php echo $i ?>" id="beschreibung<?php echo $i ?>"></td>
+					</tr>
+				<?php } ?>
+			</tbody>
+		</table>
+		<input type="submit" value="Speichern">
+	</form>
+</body>
+</html>
+<?php
+$servername = "localhost"; // Ihr MySQL-Servername
+$username = "root"; // Ihr MySQL-Benutzername
+$password = ""; // Ihr MySQL-Passwort
+$dbname = "test"; // Ihr MySQL-Datenbankname
+
+// Verbindung zur Datenbank herstellen
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Überprüfen, ob die Verbindung hergestellt wurde
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Einfügen des Datums und der TrainingsplanNr in die Tabelle "Trainingsplan"
+$sql = "INSERT INTO Trainingsplan (datum, planNr) VALUES ('".$_POST['datum']."', '".$_POST['planNr']."')";
+$conn->query($sql);
+
+// Einfügen der Übungsinformationen in die Tabelle "Trainingsplan"
+for ($i=1; $i<=11; $i++) {
+	$uebung = $_POST['uebung'.$i];
+	$einheit = $_POST['einheit'.$i];
+	$saetze = $_POST['saetze'.$i];
+	$wiederholung = $_POST['wiederholung'.$i];
+	$tempo = $_POST['tempo'.$i];
+	$pause = $_POST['pause'.$i];
+	$beschreibung = $_POST['beschreibung'.$i];
+
+	if (!empty($uebung) || !empty($einheit) || !empty($saetze) || !empty($wiederholung) || !empty($tempo) || !empty($pause) || !empty($beschreibung)) {
+		$sql = "INSERT INTO Trainingsplan (uebung, einheit, saetze, wiederholung, tempo, pause, beschreibung) VALUES ('".$uebung."', '".$einheit."', '".$saetze."', '".$wiederholung."', '".$tempo."', '".$pause."', '".$beschreibung."')";
+		$conn->query($sql);
+	}
+}
+
+// Datenbankverbindung schließen
+$conn->close();
+
+// Weiterleitung zur Startseite oder einer Bestätigungsseite
+header('Location: index.php');
+exit();
+?>
