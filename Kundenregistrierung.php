@@ -53,7 +53,7 @@
     <?php 
     session_start();
     $pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '');
-    
+    var_dump(isset($_POST['register']));
     if(isset($_POST['register'])) {
       $error = false;
       $vorname = $_POST['vorname'];
