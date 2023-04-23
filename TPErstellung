@@ -1,89 +1,96 @@
 <!DOCTYPE html>
 <html>
- <head>
-	<title>Trainingsplan erstellen</title>
- </head>
-  <body>
-	<h2>Trainingsplan</h2>
-	<form method="post">  <!-- action="save.php" --> 
-		<label for="datum">Datum:</label>
-		<input type="date" name="datum" id="datum"><br><br>
 
-		<label for="planNr">Trainingsplan Nr:</label>
-		<input type="text" name="planNr" id="planNr"><br><br>
+<head>
+    <title>Trainingsplan erstellen</title>
+</head>
 
-		<table>
-			<thead>
-				<tr>
-					<th>Übung</th>
-					<th>Einheit</th>
-					<th>Sätze</th>
-					<th>Wiederholung</th>
-					<th>Tempo</th>
-					<th>Pause</th>
-					<th>Beschreibung</th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php session_start(); for ($i=1; $i<4; $i++) { ?>
-					<tr>
-						<td><input type="text" name="uebung<?php echo $i ?>" ></td>
-						<td><input type="text" name="einheit<?php echo $i ?>" ></td>
-						<td><input type="text" name="saetze<?php echo $i ?>" ></td>
-						<td><input type="text" name="wiederholung<?php echo $i ?>" ></td>
-						<td><input type="text" name="tempo<?php echo $i ?>" ></td>
-						<td><input type="text" name="pause<?php echo $i ?>" ></td>
-						<td><input type="text" name="beschreibung<?php echo $i ?>" ></td>
-					</tr>
-				<?php } ?>
-			</tbody>
-		</table>
-		<input type="submit" name="speichern" value="Speichern" class="button">
-	</form>
-	<?php 
-   
+<body>
+    <h2>Trainingsplan</h2>
+    <form method="post"> <!-- action="save.php" -->
+        <label for="datum">Datum:</label>
+        <input type="date" name="datum" id="datum"><br><br>
+
+        <label for="planNr">Trainingsplan Nr:</label>
+        <input type="text" name="planNr" id="planNr"><br><br>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Übung</th>
+                    <th>Einheit</th>
+                    <th>Sätze</th>
+                    <th>Wiederholung</th>
+                    <th>Tempo</th>
+                    <th>Pause</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php session_start();
+                for ($i = 1; $i < 5; $i++) { ?>
+                    <tr>
+                        <td><input type="text" name="uebung<?php echo $i ?>"></td>
+                        <td><input type="text" name="einheit<?php echo $i ?>"></td>
+                        <td><input type="text" name="saetze<?php echo $i ?>"></td>
+                        <td><input type="text" name="wiederholung<?php echo $i ?>"></td>
+                        <td><input type="text" name="tempo<?php echo $i ?>"></td>
+                        <td><input type="text" name="pause<?php echo $i ?>"></td>
+                        <td><input type="text" name="beschreibung<?php echo $i ?>"></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+        <input type="submit" name="speichern" value="Speichern" class="button">
+    </form>
+    <?php
+    $error  = false;
     $pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '');
-   
-    if(isset($_POST['speichern'])) {
-		for ($i = 1; $i < 4; $i++) {
-			echo $i;
-      $error = false;
-      $datum = $_POST['datum'];
-      $planNr = $_POST['planNr'];
-      $uebung[$i] = $_POST['uebung' . $i];
-      $einheit[$i] = $_POST['einheit' . $i];
-      $saetze[$i] = $_POST['saetze' . $i];
-      $wiederholung[$i] = $_POST['wiederholung' . $i];
-      $tempo[$i] = $_POST['tempo' . $i];
-      $pause[$i] = $_POST['pause'. $i];
-      $beschreibung[$i] = $_POST['beschreibung' . $i];
-     
-   
-        // Check if the values already exist in the database
-  $statement = $pdo->prepare("SELECT COUNT(*) FROM Trainingsplan WHERE planNr=:planNr");
-  $statement->execute(array('planNr' => $planNr));
-  $result = $statement->fetchColumn();
-  if($result > 0) {
-    // Display an error message to the user
-    echo "Der Trainingsplan is bereits vergeben";
-    $error = true;
-  }
 
-      
-      
-      //Keine Fehler, wir können den Nutzer registrieren
-      if(!$error) {   
-        $statement = $pdo->prepare("INSERT INTO Trainingsplan (beschreibung,datum,einheit,[pause],planNr,saetze,tempo,uebung,wiederholung)
-         VALUES (:beschreibung,:datum,:einheit,:[pause],:planNr,:saetze,:tempo,:uebung,:wiederholung)");
-        $result = $statement->execute(array('beschreibung' => $beschreibung[$i], 'datum' => $datum, 'einheit' => $einheit[$i],'[pause]' => $pause[$i], 'planNr' => $planNr,'saetze' => $saetze[$i],'tempo' => $tempo[$i],'uebung' => $uebung[$i],'wiederholung' => $wiederholung[$i]));
-        var_dump($pdo->errorInfo());
+    if (isset($_POST['speichern'])) {
+        // Check if the values already exist in the database
+        $planNr = $_POST['planNr'];
+        $statement = $pdo->prepare("SELECT COUNT(*) FROM Trainingsplan WHERE planNr=:planNr");
+        $statement->execute(array('planNr' => $planNr));
+        $result = $statement->fetchColumn();
         
-       
-      } 
-	}  
-    header('Location: ' . $_SERVER['PHP_SELF']); // reload the page
-    exit(); // terminate script execution
-}
+        if ($result > 0) {
+            // Display an error message to the user
+            echo "Der Trainingsplan is bereits vergeben";
+            $error = true;
+        }
+        for ($i = 1; $i < 5; $i++) {
+            
+            
+            $datum = $_POST['datum'];
+            $planNr = $_POST['planNr'];
+            $uebung[$i] = $_POST['uebung' . $i];
+            $einheit[$i] = $_POST['einheit' . $i];
+            $saetze[$i] = $_POST['saetze' . $i];
+            $wiederholung[$i] = $_POST['wiederholung' . $i];
+            $tempo[$i] = $_POST['tempo' . $i];
+            $pause[$i] = $_POST['pause' . $i];
+            $beschreibung[$i] = $_POST['beschreibung' . $i];
+
+
+           
+
+
+
+            //Keine Fehler, wir können den Nutzer registrieren
+            if (!$error) {
+                $statement = $pdo->prepare("INSERT INTO Trainingsplan (beschreibung,datum,einheit,pause,planNr,saetze,tempo,uebung,wiederholung)
+         VALUES (:beschreibung,:datum,:einheit,:pause,:planNr,:saetze,:tempo,:uebung,:wiederholung)");
+                $result = $statement->execute(array('beschreibung' => $beschreibung[$i], 'datum' => $datum, 'einheit' => $einheit[$i], 'pause' => $pause[$i], 'planNr' => $planNr, 'saetze' => $saetze[$i], 'tempo' => $tempo[$i], 'uebung' => $uebung[$i], 'wiederholung' => $wiederholung[$i]));
+                var_dump($pdo->errorInfo());
+
+
+            }
+        }
+        header('Location: ' . $_SERVER['PHP_SELF']); // reload the page
+        exit(); // terminate script execution
+    }
     ?>
- </body>
-  </html>
+</body>
+
+</html>
