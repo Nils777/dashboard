@@ -28,7 +28,7 @@
             </thead>
             <tbody>
                 <?php session_start();
-                for ($i = 1; $i < 5; $i++) { ?>
+                for ($i = 1; $i < 11; $i++) { ?>
                     <tr>
                         <td><input type="text" name="uebung<?php echo $i ?>"></td>
                         <td><input type="text" name="einheit<?php echo $i ?>"></td>
@@ -59,7 +59,7 @@
             echo "Der Trainingsplan is bereits vergeben";
             $error = true;
         }
-        for ($i = 1; $i < 5; $i++) {
+        for ($i = 1; $i < 11; $i++) {
             
             
             $datum = $_POST['datum'];
@@ -79,17 +79,20 @@
 
             //Keine Fehler, wir können den Nutzer registrieren
             if (!$error) {
+                if ($einheit[$i] != "" && $uebung[$i]!="" && $planNr !="" && $datum !="" ){
                 $statement = $pdo->prepare("INSERT INTO Trainingsplan (beschreibung,datum,einheit,pause,planNr,saetze,tempo,uebung,wiederholung)
          VALUES (:beschreibung,:datum,:einheit,:pause,:planNr,:saetze,:tempo,:uebung,:wiederholung)");
                 $result = $statement->execute(array('beschreibung' => $beschreibung[$i], 'datum' => $datum, 'einheit' => $einheit[$i], 'pause' => $pause[$i], 'planNr' => $planNr, 'saetze' => $saetze[$i], 'tempo' => $tempo[$i], 'uebung' => $uebung[$i], 'wiederholung' => $wiederholung[$i]));
                 var_dump($pdo->errorInfo());
-
+                }
 
             }
         }
-        header('Location: ' . $_SERVER['PHP_SELF']); // reload the page
-        exit(); // terminate script execution
+         header('Location: ' . $_SERVER['PHP_SELF']); // reload the page
+         exit(); // terminate script execution
+        
     }
+    
     ?>
 </body>
 
